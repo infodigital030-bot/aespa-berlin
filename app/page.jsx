@@ -73,6 +73,27 @@ const occasions = [
 const times = ['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00']
 
 const SLIDES = ['/spa1.jpeg', '/spa2.jpeg', '/spa3.jpeg']
+const LAUNCH_DATE = new Date('2026-08-01T10:00:00')
+
+function useCountdown(target) {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+  useEffect(() => {
+    function calc() {
+      const diff = target - Date.now()
+      if (diff <= 0) return setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+      setTimeLeft({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+      })
+    }
+    calc()
+    const id = setInterval(calc, 1000)
+    return () => clearInterval(id)
+  }, [target])
+  return timeLeft
+}
 
 export default function SpaPage() {
   const [selectedPkg, setSelectedPkg] = useState('')
@@ -82,7 +103,9 @@ export default function SpaPage() {
   const [slide, setSlide] = useState(0)
   const [prev, setPrev] = useState(null)
   const [transitioning, setTransitioning] = useState(false)
+  const [bannerClosed, setBannerClosed] = useState(false)
   const timerRef = useRef(null)
+  const countdown = useCountdown(LAUNCH_DATE)
 
   function goTo(idx) {
     if (transitioning || idx === slide) return
@@ -112,6 +135,85 @@ export default function SpaPage() {
 
   return (
     <div style={{ fontFamily: "'Jost', sans-serif", background: CREAM, color: DARK }}>
+
+      {/* COUNTDOWN BANNER */}
+      {!bannerClosed && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
+          background: `linear-gradient(135deg, ${DARK} 0%, #3a3628 50%, ${DARK} 100%)`,
+          borderBottom: `1px solid ${SAGE}`,
+          padding: '0',
+        }}>
+          <style>{`
+            @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+            .pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+            .banner-btn { transition: all 0.2s ease; }
+            .banner-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+          `}</style>
+
+          <div style={{
+            maxWidth: 1280, margin: '0 auto',
+            padding: '14px clamp(16px,4vw,48px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            flexWrap: 'wrap', gap: 12,
+          }}>
+            {/* Left: label + countdown */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: SAGE, display: 'inline-block' }}/>
+                <span style={{ color: SAGE_LIGHT, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 500 }}>Eröffnung</span>
+              </div>
+              <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                {[['days','T'],['hours','H'],['minutes','M'],['seconds','S']].map(([key, label], i) => (
+                  <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {i > 0 && <span style={{ color: 'rgba(247,245,240,0.25)', fontSize: 18, fontWeight: 300 }}>:</span>}
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{
+                        background: 'rgba(138,143,106,0.18)', borderRadius: 4, padding: '4px 10px',
+                        minWidth: 38, fontFamily: "'Cormorant Garamond', serif",
+                        fontSize: 'clamp(18px,2.5vw,26px)', fontWeight: 400, color: CREAM, lineHeight: 1,
+                      }}>
+                        {String(countdown[key]).padStart(2,'0')}
+                      </div>
+                      <div style={{ fontSize: 8, letterSpacing: '0.16em', color: 'rgba(247,245,240,0.35)', marginTop: 3 }}>{label}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <span style={{ color: 'rgba(247,245,240,0.5)', fontSize: 12 }}>bis 1. August 2026</span>
+            </div>
+
+            {/* Right: CTA buttons */}
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <a href="#buchen" className="banner-btn" style={{
+                background: SAGE, color: '#fff', padding: '9px 22px',
+                fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase',
+                textDecoration: 'none', borderRadius: 2, whiteSpace: 'nowrap',
+              }}>Jetzt vormerken</a>
+              <a
+                href="https://wa.me/4930000000?text=Hallo%2C%20ich%20m%C3%B6chte%20mich%20f%C3%BCr%20die%20Er%C3%B6ffnung%20des%20ae%20SPA%20vormerken%20lassen."
+                target="_blank" rel="noopener noreferrer"
+                className="banner-btn"
+                style={{
+                  background: '#25D366', color: '#fff', padding: '9px 18px',
+                  fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase',
+                  textDecoration: 'none', borderRadius: 2, display: 'flex', alignItems: 'center', gap: 7,
+                  whiteSpace: 'nowrap',
+                }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WhatsApp
+              </a>
+              <button onClick={() => setBannerClosed(true)} style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: 'rgba(247,245,240,0.3)', fontSize: 18, lineHeight: 1, padding: '4px 6px',
+              }}>×</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Spacer so content doesn't hide under banner */}
+      {!bannerClosed && <div style={{ height: 72 }} />}
 
       {/* NAV */}
       <nav style={{
@@ -482,20 +584,21 @@ export default function SpaPage() {
 }
 
 function AeLogo({ size = 80, light = false }) {
-  const color = light ? '#f7f5f0' : '#8a8f6a'
-  const textColor = light ? 'rgba(247,245,240,0.7)' : '#8a8f6a'
+  if (light) {
+    return (
+      <div style={{
+        background: 'rgba(247,245,240,0.12)',
+        backdropFilter: 'blur(8px)',
+        borderRadius: 8,
+        padding: '6px 12px',
+        display: 'inline-flex',
+      }}>
+        <img src="/ae-spa-logo.jpeg" alt="ae SPA" style={{ height: size, width: 'auto', display: 'block', borderRadius: 4 }} />
+      </div>
+    )
+  }
   return (
-    <svg width={size} height={size * 1.1} viewBox="0 0 120 132" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <text x="8" y="80" fontFamily="Playfair Display, Georgia, serif" fontSize="72" fontStyle="italic" fontWeight="400" fill={color}>ae</text>
-      <line x1="8" y1="98" x2="34" y2="98" stroke={color} strokeWidth="0.8"/>
-      <line x1="82" y1="98" x2="112" y2="98" stroke={color} strokeWidth="0.8"/>
-      <text x="60" y="103" fontFamily="Jost, sans-serif" fontSize="11" letterSpacing="4" textAnchor="middle" fill={textColor} fontWeight="400">SPA</text>
-      <g transform="translate(60,120) scale(0.9)">
-        <path d="M0,-10 C-5,-5 -5,0 0,2 C5,0 5,-5 0,-10Z" stroke={color} strokeWidth="1" fill="none"/>
-        <path d="M-8,-6 C-10,0 -7,3 0,2 C-3,-1 -5,-5 -8,-6Z" stroke={color} strokeWidth="1" fill="none"/>
-        <path d="M8,-6 C10,0 7,3 0,2 C3,-1 5,-5 8,-6Z" stroke={color} strokeWidth="1" fill="none"/>
-      </g>
-    </svg>
+    <img src="/ae-spa-logo.jpeg" alt="ae SPA" style={{ height: size, width: 'auto', display: 'block' }} />
   )
 }
 
