@@ -10,20 +10,49 @@ const MID = '#5a5748'
 
 const packages = [
   {
-    name: 'Halbtag',
-    duration: '4 Stunden',
-    price: '250 €',
+    name: '4 Stunden',
+    persons: '2 Personen',
+    price: '200 €',
     highlight: false,
+    tag: null,
     desc: 'Perfekt für einen entspannten Nachmittag oder Abend. Whirlpool, Sauna & Outdoor Pool exklusiv für euch.',
-    includes: ['Whirlpool', 'Sauna', 'Outdoor Pool', 'Sitzbereich & Kamin', 'Bis zu 4 Personen'],
+    includes: ['Whirlpool', 'Sauna', 'Outdoor Pool', 'Sitzbereich & Kamin', '2 Personen'],
   },
   {
-    name: 'Ganztag',
-    duration: '12 Stunden',
+    name: '8 Stunden',
+    persons: '2 Personen',
+    price: '250 €',
+    highlight: false,
+    tag: null,
+    desc: 'Ein ganzer Tag Entspannung — ohne Stress, ohne Zeitdruck.',
+    includes: ['Whirlpool', 'Sauna', 'Outdoor Pool', 'Sitzbereich & Kamin', '2 Personen'],
+  },
+  {
+    name: '12 Stunden',
+    persons: '2 Personen',
     price: '300 €',
     highlight: true,
+    tag: 'Beliebt',
     desc: 'Das volle ae SPA Erlebnis. Den ganzen Tag nur für euch — entspannt, ungestört, unvergesslich.',
-    includes: ['Whirlpool', 'Sauna', 'Outdoor Pool', 'Sitzbereich & Kamin', 'Liegen', 'Bis zu 4 Personen', 'Alles bestellbar'],
+    includes: ['Whirlpool', 'Sauna', 'Outdoor Pool', 'Sitzbereich & Kamin', 'Liegen', '2 Personen', 'Alles bestellbar'],
+  },
+  {
+    name: 'Übernachtung',
+    persons: '2 Personen',
+    price: '350 €',
+    highlight: false,
+    tag: null,
+    desc: 'Check-in ab 12:00 Uhr, Check-out 10:00 Uhr. Die ultimative Auszeit — bleibt einfach über Nacht.',
+    includes: ['Whirlpool', 'Sauna', 'Outdoor Pool', 'Sitzbereich & Kamin', 'Liegen', '2 Personen', 'Check-in 12:00 · Check-out 10:00'],
+  },
+  {
+    name: '12 Std. Girls',
+    persons: '4 Personen',
+    price: '280 €',
+    highlight: false,
+    tag: '👯‍♀️ Girls',
+    desc: 'Das perfekte Paket für euren Girls Spa Day — der ganze Spaß, für bis zu 4 Personen.',
+    includes: ['Whirlpool', 'Sauna', 'Outdoor Pool', 'Sitzbereich & Kamin', 'Liegen', '4 Personen', 'Alles bestellbar'],
   },
 ]
 
@@ -124,7 +153,7 @@ export default function SpaPage() {
 
       {/* STATS */}
       <section style={{ background: SAGE, padding: '26px clamp(24px,5vw,80px)', display: 'flex', justifyContent: 'center', gap: 'clamp(28px,6vw,100px)', flexWrap: 'wrap' }}>
-        {[['Personen','bis zu 4'],['Whirlpool','✓'],['Sauna','✓'],['Outdoor Pool','✓'],['Ab','250 €']].map(([label,val]) => (
+        {[['Personen','bis zu 4'],['Whirlpool','✓'],['Sauna','✓'],['Outdoor Pool','✓'],['Ab','200 €']].map(([label,val]) => (
           <div key={label} style={{ textAlign: 'center' }}>
             <div style={{ color: '#fff', fontSize: 'clamp(20px,2.5vw,30px)', fontWeight: 300, fontFamily: "'Cormorant Garamond', serif" }}>{val}</div>
             <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', marginTop: 4 }}>{label}</div>
@@ -135,42 +164,66 @@ export default function SpaPage() {
       {/* PAKETE */}
       <section id="angebot" style={{ padding: 'clamp(60px,8vw,110px) clamp(24px,6vw,80px)' }}>
         <SectionHeader label="Preise & Pakete" title="Euer Spa-Erlebnis" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px,1fr))', gap: 24, marginTop: 52, maxWidth: 800, margin: '52px auto 0' }}>
+
+        {/* Package grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px,1fr))', gap: 20, marginTop: 52 }}>
           {packages.map(p => (
             <div key={p.name} style={{
-              background: p.highlight ? DARK : WARM, padding: '44px 36px', borderRadius: 4,
+              background: p.highlight ? DARK : WARM, padding: '36px 32px', borderRadius: 4,
               position: 'relative', border: p.highlight ? `2px solid ${SAGE}` : '2px solid transparent',
             }}>
-              {p.highlight && (
+              {p.tag && (
                 <div style={{
                   position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
-                  background: SAGE, color: '#fff', fontSize: 10, letterSpacing: '0.18em',
-                  textTransform: 'uppercase', padding: '4px 16px', borderRadius: 2,
-                }}>Empfehlung</div>
+                  background: SAGE, color: '#fff', fontSize: 10, letterSpacing: '0.16em',
+                  textTransform: 'uppercase', padding: '4px 14px', borderRadius: 2, whiteSpace: 'nowrap',
+                }}>{p.tag}</div>
               )}
-              <div style={{ fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: SAGE_LIGHT, marginBottom: 8 }}>{p.duration}</div>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 400, color: p.highlight ? CREAM : DARK, marginBottom: 8 }}>{p.name}</h3>
-              <div style={{ fontSize: 38, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: SAGE, marginBottom: 20 }}>{p.price}</div>
-              <p style={{ fontSize: 13, color: p.highlight ? 'rgba(247,245,240,0.7)' : MID, lineHeight: 1.75, marginBottom: 24 }}>{p.desc}</p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {/* persons badge */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <span style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: SAGE_LIGHT }}>{p.persons}</span>
+              </div>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 400, color: p.highlight ? CREAM : DARK, marginBottom: 6 }}>{p.name}</h3>
+              <div style={{ fontSize: 36, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: SAGE, marginBottom: 16 }}>{p.price}</div>
+              <p style={{ fontSize: 13, color: p.highlight ? 'rgba(247,245,240,0.65)' : MID, lineHeight: 1.7, marginBottom: 20 }}>{p.desc}</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {p.includes.map(item => (
-                  <li key={item} style={{ fontSize: 13, color: p.highlight ? 'rgba(247,245,240,0.8)' : MID, display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ color: SAGE, fontSize: 16 }}>✓</span> {item}
+                  <li key={item} style={{ fontSize: 12, color: p.highlight ? 'rgba(247,245,240,0.75)' : MID, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ color: SAGE }}>✓</span> {item}
                   </li>
                 ))}
               </ul>
               <a href="#buchen" style={{
-                display: 'inline-block', marginTop: 32,
+                display: 'inline-block', marginTop: 28,
                 background: p.highlight ? SAGE : 'transparent',
-                border: `1px solid ${p.highlight ? SAGE : 'rgba(138,143,106,0.5)'}`,
+                border: `1px solid ${p.highlight ? SAGE : 'rgba(138,143,106,0.45)'}`,
                 color: p.highlight ? '#fff' : SAGE,
-                padding: '12px 28px', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase',
+                padding: '11px 24px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase',
                 textDecoration: 'none', borderRadius: 2,
               }}>Buchen</a>
             </div>
           ))}
         </div>
-        <p style={{ textAlign: 'center', fontSize: 12, color: MID, marginTop: 28 }}>Alle Preise inkl. MwSt. · Getränke & Snacks auf Anfrage bestellbar</p>
+
+        {/* Shuttle Service Card */}
+        <div style={{
+          marginTop: 28, background: DARK, borderRadius: 4, padding: '32px 36px',
+          display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 24,
+        }}>
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: SAGE_LIGHT, marginBottom: 8 }}>Zusatzservice</div>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 400, color: CREAM, marginBottom: 8 }}>🚗 Shuttle Service</h3>
+            <p style={{ fontSize: 13, color: 'rgba(247,245,240,0.65)', lineHeight: 1.7, maxWidth: 480 }}>
+              Wir holen euch ab und fahren euch zurück — stressfrei von Tür zu Tür. Kein Parken, kein Navi, keine Gedanken.
+            </p>
+          </div>
+          <div style={{ textAlign: 'center', flexShrink: 0 }}>
+            <div style={{ fontSize: 32, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: SAGE }}>50 € + 1 €/km</div>
+            <div style={{ fontSize: 11, color: 'rgba(247,245,240,0.45)', letterSpacing: '0.12em', marginTop: 4 }}>Pauschale + pro Kilometer</div>
+          </div>
+        </div>
+
+        <p style={{ textAlign: 'center', fontSize: 12, color: MID, marginTop: 24 }}>Alle Preise inkl. MwSt. · Getränke & Snacks auf Anfrage bestellbar</p>
       </section>
 
       {/* ZITAT */}
@@ -303,7 +356,8 @@ export default function SpaPage() {
                 <label style={labelStyle}>Paket</label>
                 <select value={selectedPkg} onChange={e => setSelectedPkg(e.target.value)} style={selectStyle}>
                   <option value="">Bitte wählen …</option>
-                  {packages.map(p => <option key={p.name} value={p.name}>{p.name} ({p.duration}) – {p.price}</option>)}
+                  {packages.map(p => <option key={p.name} value={p.name}>{p.name} · {p.persons} – {p.price}</option>)}
+                  <option value="shuttle">+ Shuttle Service (50 € + 1 €/km)</option>
                 </select>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
