@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const SAGE = '#8a8f6a'
 const SAGE_LIGHT = '#b5b98f'
@@ -72,11 +72,38 @@ const occasions = [
 
 const times = ['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00']
 
+const SLIDES = ['/spa1.jpeg', '/spa2.jpeg', '/spa3.jpeg']
+
 export default function SpaPage() {
   const [selectedPkg, setSelectedPkg] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
   const [form, setForm] = useState({ name: '', email: '', phone: '', date: '', persons: '2', notes: '' })
   const [sent, setSent] = useState(false)
+  const [slide, setSlide] = useState(0)
+  const [prev, setPrev] = useState(null)
+  const [transitioning, setTransitioning] = useState(false)
+  const timerRef = useRef(null)
+
+  function goTo(idx) {
+    if (transitioning || idx === slide) return
+    setPrev(slide)
+    setSlide(idx)
+    setTransitioning(true)
+    setTimeout(() => { setPrev(null); setTransitioning(false) }, 1400)
+  }
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setSlide(s => {
+        const next = (s + 1) % SLIDES.length
+        setPrev(s)
+        setTransitioning(true)
+        setTimeout(() => { setPrev(null); setTransitioning(false) }, 1400)
+        return next
+      })
+    }, 5000)
+    return () => clearInterval(timerRef.current)
+  }, [])
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -108,29 +135,69 @@ export default function SpaPage() {
         }}>Jetzt buchen</a>
       </nav>
 
-      {/* HERO */}
+      {/* HERO SLIDER */}
       <section style={{ position: 'relative', height: '100vh', minHeight: 640, overflow: 'hidden' }}>
-        <img src="/spa1.jpeg" alt="ae SPA Henningsdorf"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(30,28,22,0.3) 0%, rgba(30,28,22,0.5) 60%, rgba(30,28,22,0.8) 100%)' }} />
+        <style>{`
+          @keyframes zoomIn {
+            from { transform: scale(1); }
+            to   { transform: scale(1.08); }
+          }
+          @keyframes fadeOut {
+            from { opacity: 1; }
+            to   { opacity: 0; }
+          }
+          .hero-slide-active {
+            animation: zoomIn 6s ease-out forwards;
+          }
+          .hero-slide-leaving {
+            animation: fadeOut 1.4s ease-out forwards;
+          }
+          .slide-dot { transition: all 0.3s ease; cursor: pointer; }
+          .slide-dot:hover { opacity: 1 !important; transform: scale(1.2); }
+        `}</style>
+
+        {/* Leaving slide */}
+        {prev !== null && (
+          <img
+            key={`prev-${prev}`}
+            src={SLIDES[prev]}
+            alt=""
+            className="hero-slide-leaving"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', zIndex: 1 }}
+          />
+        )}
+
+        {/* Active slide */}
+        <img
+          key={`slide-${slide}`}
+          src={SLIDES[slide]}
+          alt="ae SPA Henningsdorf"
+          className="hero-slide-active"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', zIndex: 2 }}
+        />
+
+        {/* Gradient overlay */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 3, background: 'linear-gradient(to bottom, rgba(20,18,12,0.25) 0%, rgba(20,18,12,0.42) 50%, rgba(20,18,12,0.82) 100%)' }} />
+
+        {/* Content */}
         <div style={{
-          position: 'relative', zIndex: 2, height: '100%',
+          position: 'absolute', inset: 0, zIndex: 4,
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           textAlign: 'center', padding: '0 24px',
         }}>
-          <p style={{ color: SAGE_LIGHT, letterSpacing: '0.25em', fontSize: 11, textTransform: 'uppercase', marginBottom: 24 }}>Privates Luxus-Spa · Henningsdorf bei Berlin</p>
-          <AeLogo size={120} light />
+          <p style={{ color: SAGE_LIGHT, letterSpacing: '0.28em', fontSize: 11, textTransform: 'uppercase', marginBottom: 28 }}>Privates Luxus-Spa · Henningsdorf bei Berlin</p>
+          <AeLogo size={130} light />
           <p style={{
             fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic',
-            color: 'rgba(247,245,240,0.85)', fontSize: 'clamp(18px,2.5vw,28px)',
-            marginTop: 28, maxWidth: 560, lineHeight: 1.6,
+            color: 'rgba(247,245,240,0.88)', fontSize: 'clamp(18px,2.5vw,28px)',
+            marginTop: 30, maxWidth: 560, lineHeight: 1.65,
           }}>Euer Spa. Nur für euch. Bis zu 4 Personen, ganztags buchbar.</p>
-          <div style={{ marginTop: 16, display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div style={{ marginTop: 18, display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
             {occasions.map(o => (
-              <span key={o.label} style={{ color: 'rgba(247,245,240,0.7)', fontSize: 13 }}>{o.emoji} {o.label}</span>
+              <span key={o.label} style={{ color: 'rgba(247,245,240,0.65)', fontSize: 13 }}>{o.emoji} {o.label}</span>
             ))}
           </div>
-          <div style={{ marginTop: 40, display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ marginTop: 44, display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             <a href="#buchen" style={{
               background: SAGE, color: '#fff', padding: '15px 40px',
               letterSpacing: '0.14em', fontSize: 12, textTransform: 'uppercase',
@@ -143,11 +210,20 @@ export default function SpaPage() {
             }}>Preise & Pakete</a>
           </div>
         </div>
-        <div style={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', opacity: 0.45 }}>
-          <svg width="18" height="30" viewBox="0 0 18 30" fill="none">
-            <rect x="8" y="0" width="2" height="18" fill={CREAM} rx="1"/>
-            <path d="M2 12 L9 20 L16 12" stroke={CREAM} strokeWidth="1.5" fill="none"/>
-          </svg>
+
+        {/* Slide dots */}
+        <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 5, display: 'flex', gap: 10 }}>
+          {SLIDES.map((_, i) => (
+            <div
+              key={i}
+              className="slide-dot"
+              onClick={() => goTo(i)}
+              style={{
+                width: i === slide ? 28 : 8, height: 8, borderRadius: 4,
+                background: '#fff', opacity: i === slide ? 0.9 : 0.35,
+              }}
+            />
+          ))}
         </div>
       </section>
 
