@@ -89,12 +89,12 @@ export default function SpaPage() {
       {/* NAV */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        padding: '18px clamp(20px,5vw,56px)',
+        padding: '10px clamp(20px,5vw,56px)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         background: 'rgba(247,245,240,0.93)', backdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(138,143,106,0.15)',
       }}>
-        <AeLogo size={52} />
+        <AeLogo size={72} />
         <div style={{ display: 'flex', gap: 32, fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: MID }}>
           <a href="#angebot" style={{ color: MID, textDecoration: 'none' }}>Angebot</a>
           <a href="#ausstattung" style={{ color: MID, textDecoration: 'none' }}>Ausstattung</a>
